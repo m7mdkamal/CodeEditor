@@ -1,6 +1,30 @@
 import React from 'react'
 import Tab from './Tab'
+import TabStore from '../../stores/TabStore'
+
+var TAB_CHANGE_EVENT = 'TABCHANGE';
+
 class Editor extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {tabs : []};
+
+        // this.handleNewFile = this.handleNewFile.bind(this);
+        // this.handleDeleteFile = this.handleDeleteFile.bind(this);
+    }
+
+    componentWillMount() {
+        TabStore.on(TAB_CHANGE_EVENT, () => {
+            this.setState({
+                tabs: TabStore.getTabs()
+            })
+        })
+        this.setState({
+            tabs: TabStore.getTabs()
+        })
+    }
+
     render(){
         return(
             <div className="editor">
@@ -12,21 +36,16 @@ class Editor extends React.Component {
                         chevron_right
                     </div>
 
-                    <Tab />
+                    {this.state.tabs.map((tab, i) => {
+                        return (
+                            <Tab key={tab.id}
+                                  fileName={tab.fileName}
+                                  isSelected={tab.isSelected}
+                                  data={tab}/>
+                        );
+                    })}
 
-
-                    <div className="tab">
-                        <div className="tab-label">index.html</div>
-                        <div className="tab-close material-icons">close</div>
-                    </div>
-                    <div className="tab">
-                        <div className="tab-label">index.html</div>
-                        <div className="tab-close material-icons">close</div>
-                    </div>
-                    <div className="tab tab-open">
-                        <div className="tab-label">student.java</div>
-                        <div className="tab-close material-icons">close</div>
-                    </div>
+                    
 
 
                 </div>
