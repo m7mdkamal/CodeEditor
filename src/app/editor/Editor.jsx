@@ -1,33 +1,83 @@
 import React from 'react'
 import Tab from './Tab'
 import TabStore from '../../stores/TabStore'
+import EditorStore from '../../stores/EditorStore'
+import  * as actions from '../../actions/actions'
 
+// require('brace/mode/java');
+// require('brace/theme/monokai');
+// require('brace')
+// import ace from 'brace'
 var TAB_CHANGE_EVENT = 'TABCHANGE';
+var EDITOR_CHANGE_EVENT = 'EDITORCHANGE';
 
 class Editor extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {tabs : []};
-
+        this.state = {tabs: [], code: "", editorHidden: true};
         // this.handleNewFile = this.handleNewFile.bind(this);
         // this.handleDeleteFile = this.handleDeleteFile.bind(this);
+        //todo: Handle scrolling
+        // $(".tabs").scrollLeft();
+        // $(".tabs").animate({scrollLeft: ($(".tabs").scrollLeft() + 100)});
+        this.onEditorChange = this.onEditorChange.bind(this)
     }
 
     componentWillMount() {
         TabStore.on(TAB_CHANGE_EVENT, () => {
             this.setState({
                 tabs: TabStore.getTabs()
-            })
-        })
+            });
+            // Actions.fetchSourceCode(TabStore.getCurrentFileKey())
+        });
         this.setState({
             tabs: TabStore.getTabs()
+        });
+        EditorStore.on(EDITOR_CHANGE_EVENT, function () {
+            // editor.session.setValue(this.state.code)
         })
     }
 
-    render(){
-        return(
-            <div className="editor">
+    componentDidMount() {
+        window.ace = ace;
+        ace.require("ace/ext/language_tools");
+        var editor = ace.edit('editor1');
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false
+        });
+        editor.setTheme("ace/theme/textmate");
+        editor.getSession().setMode("ace/mode/java");
+        editor.setFontSize(12);
+        EditorStore.on(EDITOR_CHANGE_EVENT, this.onEditorChange);
+        window.editor = editor;
+
+    }
+
+    onEditorChange(){
+        // console.error("EDITOR CHANGED")
+        editor.removeAllListeners("change");
+        if (EditorStore.getCurrentCode() != null) {
+            editor.session.setValue(EditorStore.getCurrentCode());
+            this.setState({
+                editorHidden: false
+            });
+        }else{
+            this.setState({
+                editorHidden: true
+            });
+        }
+        editor.on("change",function () {
+            actions.codeChanged(editor.getSession().getValue())
+        });
+    }
+
+    render() {
+        return (
+            <div className={"editor "+(this.state.editorHidden?"editor-blank":"")}>
+                <div className={this.state.editorHidden?"editor-no-file-selected":"editor-file-selected"}>Select File</div>
                 <div className="tabs">
                     <div className="scrolls scroll_left material-icons">
                         chevron_left
@@ -39,19 +89,17 @@ class Editor extends React.Component {
                     {this.state.tabs.map((tab, i) => {
                         return (
                             <Tab key={tab.id}
-                                  fileName={tab.fileName}
-                                  isSelected={tab.isSelected}
-                                  data={tab}/>
+                                 fileName={tab.fileName}
+                                 isSelected={tab.isSelected}
+                                 data={tab}/>
                         );
                     })}
 
-                    
-
 
                 </div>
-                <div className="textEditor" id="editor1"  styleName={{"width": "100%" ,"height":"calc(100% - 115px)","border-radius": "0"}}>
-                    Test goes here
-                </div>
+                <pre id="editor1" className="text-editor">
+
+                </pre>
             </div>
 
         )

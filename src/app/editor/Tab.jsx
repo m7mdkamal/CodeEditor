@@ -23,9 +23,9 @@ class Tab extends React.Component {
 
     render(){
         return(
-            <div className={"tab "+(this.props.isSelected?"tab-open":"")}
-                 onClick={this.handleSelectTab.bind(this,this.props.data.id)}>
-                <div className="tab-label">{this.props.fileName}</div>
+            <div className={"tab "+(this.props.isSelected?"tab-open":"")}>
+                <div className="tab-label"
+                     onClick={this.handleSelectTab.bind(this,this.props.data.id)}>{this.props.fileName}</div>
                 <div className="tab-close material-icons" key={this.props.data.id}
                      onClick={this.handleCloseTab.bind(this,this.props.data.id)}>close</div>
             </div>

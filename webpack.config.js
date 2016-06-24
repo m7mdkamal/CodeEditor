@@ -4,7 +4,7 @@ var path = require('path');
 var config = {
     entry: [
         'webpack/hot/dev-server',
-        'webpack-dev-server/client?http://localhost:3001',
+        // 'webpack-dev-server/client?http://' + require("ip").address() + ':8001',
         './src/main.js'
     ],
     resolve: {
@@ -22,11 +22,11 @@ var config = {
             {
                 test: /\.jsx?$/,
                 exclude: /(node_modules|bower_components)/,
-                loader: 'babel',
+                loader: 'babel'
 
             }
-        ],
+        ]
     }
-}
+};
 
 module.exports = config;

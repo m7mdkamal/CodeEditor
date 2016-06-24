@@ -1,49 +1,80 @@
 import {EventEmitter} from "events"
 import dispatcher from "../dispatcher"
-
+import  * as fileSource from '../sources/FileSource'
+import  * as Actions from '../../actions/actions'
 
 var FILE_CHANGE_EVENT = 'FILECHANGE';
+var FILE_MSG_EVENT = 'FILEMSG';
 
 class FileStore extends EventEmitter {
 
     constructor() {
         super();
 
-        this.files = [
-            {
-                fileName : "java1.java",
-                isSelected : false,
-                id : 1
-            },
-            {
-                fileName : "ja42.java",
-                isSelected : true,
-                id : 2
-            },
-            {
-                fileName : "java2.java",
-                isSelected : false,
-                id : 3
-            }
-        ];
-        this.errors = [];
+        this.files = [];
+        this.msgs = [];
+
+
         this.state = {error: null, selected: null};
+
+        fileSource.fetchFiles();
     }
 
+    handleActions(action) {
+        switch (action.type) {
+            case "CREATE_FILE" :
+                this.createFile(action.name);
+                break;
+            case "CREATE_FILE_SUCCESS":
+                this.createFileSuccess(action.name);
+                break;
+            case "CREATE_FILE_FAILED":
+                this.createFileFailed(action.name);
+                break;
 
-    fetchDirectoriesSuccess(directories) {
+            case "SELECT_FILE":
+                this.selectFile(action.id);
+                break;
 
-        this.files = directories.map((file)=> {
+            case "DELETE_FILE":
+                this.deleteFile(action.id);
+                break;
+            case "DELETE_FILE_SUCCESS":
+                this.deleteFileSuccess(action.name);
+                break;
+            case "DELETE_FILE_FAILED":
+                this.deleteFileFailed();
+                break;
+
+            case "FETCH_FILES_SUCCESS":
+                this.fetchDirectoriesSuccess(action.files);
+                break;
+
+            case "FETCH_FILES_FAILED":
+                this.fetchDirectoriesFailed();
+                break;
+
+        }
+        this.updateView(FILE_CHANGE_EVENT)
+    }
+
+    fetchDirectoriesSuccess(files) {
+        this.files = files.map((file)=> {
             return {
                 fileName: file.fileName,
-                id: file.id,
+                id: file.fileName,
                 isSelected: false
             }
         });
-
-        //console.log(directories)
     }
 
+    fetchDirectoriesFailed() {
+        this.msgs.push({
+            type: "ERROR",
+            text: "Error: Connection Failed"
+        });
+        this.updateView(FILE_MSG_EVENT);
+    }
 
     updatefile(file) {
         this.files = file
@@ -53,35 +84,40 @@ class FileStore extends EventEmitter {
         return this.files
     }
 
-    handleActions(action) {
-        // console.log("filestore received an action", action)
-        switch (action.type) {
-            case "CREATE_FILE" :
-                this.addFile(action.name);
-                break;
-            case "SELECT_FILE":
-                this.selectFile(action.id);
-                break;
-            case "DELETE_FILE":
-                this.deleteFile(action.id);
-                break;
-            case "FETCH_FILES_SUCCESS":
-                this.fetchDirectoriesSuccess(action.dirs)
-                break
-        }
-        this.emit(FILE_CHANGE_EVENT)
+    createFile(fileName) {
+        fileSource.newFile(fileName);
     }
 
-    addFile(fileName) {
+    createFileSuccess(fileName) {
         if (this.searchByFileName(fileName) != null) {
-            this.errors.push("File name exist");
+            this.msgs.push({
+                type: "ERROR",
+                text: "File name exist"
+            });
+            this.updateView(FILE_MSG_EVENT);
             return
         }
-        this.files.push({
+        var file = {
             fileName: fileName,
             isSelected: false,
             id: fileName
-        })
+        };
+        this.files.push(file);
+        this.msgs.push({
+            type: "LOG",
+            text: fileName + " Created"
+        });
+        this.updateView(FILE_MSG_EVENT);
+
+    }
+
+
+    createFileFailed() {
+        this.msgs.push({
+            type: "ERROR",
+            text: "Error: Connection Failed"
+        });
+        this.updateView(FILE_MSG_EVENT);
     }
 
     selectFile(id) {
@@ -98,11 +134,41 @@ class FileStore extends EventEmitter {
     deleteFile(id) {
         this.files.forEach((file) => {
             if (file.id == id) {
-                this.files.splice(this.files.indexOf(file), 1);
+                fileSource.deleteFile(file.fileName);
                 return
             }
         });
-        this.state.error = "Error";
+    }
+
+    deleteFileSuccess(name){
+        this.files.forEach((file) => {
+            if (file.id == name) {
+                this.files.splice(this.files.indexOf(file), 1);
+                Actions.closeTab(file.id);
+
+                this.msgs.push({
+                    type: "LOG",
+                    text: fileName + " Deleted"
+                });
+                this.updateView(FILE_MSG_EVENT);
+                return
+            }
+        });
+        this.msgs.push({
+            type: "ERROR",
+            text: "Error: File not found"
+        });
+        this.updateView(FILE_MSG_EVENT);
+
+    }
+
+
+    deleteFileFailed(){
+        this.msgs.push({
+            type: "ERROR",
+            text: "Error: Connection Failed"
+        });
+        this.updateView(FILE_MSG_EVENT);
     }
 
     getSelectedFile() {
@@ -123,17 +189,21 @@ class FileStore extends EventEmitter {
         return null;
     }
 
-    getErrors() {
-        return this.errors;
+    getMsgs() {
+        return this.msgs;
     }
 
-    clearErrors() {
-        this.errors = []
+    clearMsgs() {
+        this.msgs = []
+    }
+
+    updateView(eventName) {
+        this.emit(eventName);
     }
 }
 
 const fileStore = new FileStore;
 
 dispatcher.register(fileStore.handleActions.bind(fileStore));
-// window.dispatcher = dispatcher
+// window.dispatcher = dispatcher;
 export default fileStore;

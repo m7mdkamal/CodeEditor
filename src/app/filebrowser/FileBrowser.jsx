@@ -1,19 +1,21 @@
 import React from 'react'
-import File from './file'
+import File from './File'
 import FileStore from '../../stores/FileStore'
 import alertify from 'alertify.js'
 import  * as Actions from '../../actions/actions'
 
 var FILE_CHANGE_EVENT = 'FILECHANGE';
+var FILE_MSG_EVENT = 'FILEMSG';
 
 class FileBrowser extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {files : []};
-
+        
         this.handleNewFile = this.handleNewFile.bind(this);
         this.handleDeleteFile = this.handleDeleteFile.bind(this);
+
     }
 
     componentWillMount() {
@@ -21,10 +23,15 @@ class FileBrowser extends React.Component {
             this.setState({
                 files: FileStore.getFiles()
             })
-        })
+        });
         this.setState({
             files: FileStore.getFiles()
-        })
+        });
+
+        FileStore.on(FILE_MSG_EVENT, () => {
+            this.alertMSG();
+        });
+
     }
 
     handleNewFile() {
@@ -33,15 +40,6 @@ class FileBrowser extends React.Component {
                 function (val, ev) {
                     ev.preventDefault();
                     Actions.createFile(val);
-                    var errs = FileStore.getErrors();
-                    if (errs.length > 0) {
-                        errs.forEach((err) => {
-                            alertify.error(err);
-                        });
-                        FileStore.clearErrors();
-                    } else {
-                        alertify.success("You've created: " + val);
-                    }
                 }, function (ev) {
                     ev.preventDefault();
                 }
@@ -56,17 +54,6 @@ class FileBrowser extends React.Component {
                 .cancelBtn("No")
                 .confirm("Are you sure?", function () {
                     Actions.deleteFile(file.id);
-                    var errs = FileStore.getErrors()
-                    if (errs.length > 0) {
-                        errs.forEach((err) => {
-                            alertify.error(err);
-                        });
-                        FileStore.errors();
-                    } else {
-                        alertify.success("You've deleted: " + file.fileName);
-                        Actions.closeTab(file.id)
-                    }
-
                 }, function () {
 
                 });
@@ -75,6 +62,20 @@ class FileBrowser extends React.Component {
         }
     }
 
+    alertMSG(){
+        var msgs = FileStore.getMsgs();
+        msgs.forEach((msg) => {
+            switch (msg.type) {
+                case "LOG":
+                    alertify.success(msg.text);
+                    break;
+                case "ERROR":
+                    alertify.error(msg.text);
+                    break
+            }
+        });
+        FileStore.clearMsgs();
+    }
 
     render(){
         return(
@@ -106,7 +107,6 @@ class FileBrowser extends React.Component {
 
     );
     }
-
 
 }
 

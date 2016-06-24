@@ -1,35 +1,76 @@
 import dispatcher from "../dispatcher"
+import ActionsConstants from "./../constants/ActionsConstants"
+
+
+/*
+ Filebrowser Actions
+ */
 
 export function createFile(name) {
     dispatcher.dispatch({
-        type : "CREATE_FILE",
+        type: "CREATE_FILE",
         name
     })
 }
 
 export function deleteFile(id) {
     dispatcher.dispatch({
-        type : "DELETE_FILE",
+        type: "DELETE_FILE",
         id
+    })
+}
+
+export function deleteFileSuccess(name) {
+    dispatcher.dispatch({
+        type: "DELETE_FILE_SUCCESS",
+        name
+    })
+}
+
+export function deleteFileFailed() {
+    dispatcher.dispatch({
+        type: "DELETE_FILE_FAILED",
+        name
     })
 }
 
 export function selectFile(id) {
     dispatcher.dispatch({
-        type : "SELECT_FILE",
+        type: "SELECT_FILE",
         id
     })
 }
 
-export function fetchFilesSuccess(dirs){
+export function fetchFilesSuccess(files) {
     dispatcher.dispatch({
         type: "FETCH_FILES_SUCCESS",
-        dirs
+        files
     })
 }
 
+export function fetchFilesFailed() {
+    dispatcher.dispatch({
+        type: "FETCH_FILES_FAILED"
+    })
+}
+
+export function createFileSuccess(name) {
+    dispatcher.dispatch({
+        type: "CREATE_FILE_SUCCESS",
+        name
+    })
+}
+
+export function createFileFailed() {
+    dispatcher.dispatch({
+        type: "CREATE_FILE_FAILED"
+    })
+}
+
+
+
 /*
-    Tabs actions
+ Tabs actions
  */
 export function openTab(file) {
     dispatcher.dispatch({
@@ -53,31 +94,24 @@ export function selectTab(id) {
 }
 
 /*
-  Editor actions
+ Editor actions
  */
 
-export function sourceCodeChanged(sourceCode){
+export function fetchCode(name) {
     dispatcher.dispatch({
-        type: "SOURCECODE_CHANGE",
-        sourceCode
+        type: "FETCH_SOURCE_CODE",
+        name
     })
 }
 
-export function fetchSourceCode(filename){
+export function fetchCodeSuccess(key, code) {
     dispatcher.dispatch({
-        type: "PULL_SOURCECODE",
-        filename
+        type: "PULL_CODE_SUCCESS",
+        code, key
     })
 }
 
-export function fetchSourceCodeSuccess(code){
-    dispatcher.dispatch({
-        type: "PULL_SOURCECODE_SUCCESS",
-        code
-    })
-}
-
-export function fetchSourceCodeFail(){
+export function fetchSourceCodeFail() {
     dispatcher.dispatch({
         type: "PULL_SOURCECODE_FAIL"
     })
@@ -96,3 +130,16 @@ export function pushSourceCodeSuccess() {
     })
 }
 
+export function codeChanged(code) {
+    dispatcher.dispatch({
+        type: "CODE_CHANGED",
+        code
+    })
+}
+
+export function clearFileCache(id) {
+    dispatcher.dispatch({
+        type:"CLEAR_FILE_CACHE",
+        id
+    })
+}
