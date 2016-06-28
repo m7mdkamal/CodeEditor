@@ -143,3 +143,47 @@ export function clearFileCache(id) {
         id
     })
 }
+
+export function pushAll() {
+    dispatcher.dispatch({
+        type:"PUSH_ALL"
+    })
+}
+
+export function pushAllSuccess() {
+    dispatcher.dispatch({
+        type:"PUSH_ALL_SUCCESS"
+    })
+}
+
+export function pushAllFailed() {
+    dispatcher.dispatch({
+        type:"PUSH_ALL_FAILED"
+    })
+}
+
+export function compile() {
+    dispatcher.dispatch({
+        type:"COMPILE"
+    })
+}
+
+export function compileSuccess(log) {
+    dispatcher.dispatch({
+        type:"COMPILE_SUCCESS",
+        log
+    })
+}
+
+export function compileFailed() {
+    dispatcher.dispatch({
+        type:"COMPILE_FAILED",
+        log
+    })
+}
+
+export function clearLogs() {
+    dispatcher.dispatch({
+        type:"CLEAR_LOGS",
+    })
+}

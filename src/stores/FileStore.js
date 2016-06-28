@@ -1,8 +1,8 @@
 import {EventEmitter} from "events"
 import dispatcher from "../dispatcher"
-import  * as fileSource from '../sources/FileSource'
-import  * as Actions from '../../actions/actions'
-
+import * as fileSource from '../sources/FileSource'
+import * as Actions from '../actions/actions'
+import TabStore from './TabStore'
 var FILE_CHANGE_EVENT = 'FILECHANGE';
 var FILE_MSG_EVENT = 'FILEMSG';
 
@@ -144,29 +144,29 @@ class FileStore extends EventEmitter {
         this.files.forEach((file) => {
             if (file.id == name) {
                 this.files.splice(this.files.indexOf(file), 1);
-                Actions.closeTab(file.id);
+                TabStore.closeTab(file.id);
 
                 this.msgs.push({
                     type: "LOG",
-                    text: fileName + " Deleted"
+                    text: name + " Deleted"
                 });
                 this.updateView(FILE_MSG_EVENT);
                 return
             }
         });
-        this.msgs.push({
-            type: "ERROR",
-            text: "Error: File not found"
-        });
-        this.updateView(FILE_MSG_EVENT);
-
+        // this.msgs.push({
+        //     type: "ERROR",
+        //     text: "Error: File not found"
+        // });
+        // this.updateView(FILE_MSG_EVENT);
+        // return Actions.closeTab(name);
     }
 
 
     deleteFileFailed(){
         this.msgs.push({
             type: "ERROR",
-            text: "Error: Connection Failed"
+            text: "Error: Delete Failed"
         });
         this.updateView(FILE_MSG_EVENT);
     }

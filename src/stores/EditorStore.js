@@ -41,6 +41,16 @@ class EditorStore extends EventEmitter {
             case "CLEAR_FILE_CACHE":
                 this.handleTabClose(action.id)
                 break;
+            case "PUSH_ALL":
+                this.handlePushAll();
+                break;
+            case "PUSH_ALL_SUCCESS":
+                this.handlePushAllSuccess();
+                break;
+            case "PUSH_ALL_FAILED":
+                this.handlePushFailed();
+                break;
+
 
         }
 
@@ -83,6 +93,25 @@ class EditorStore extends EventEmitter {
             isModified: true,
             code
         }
+    }
+
+    handlePushAll(){
+        for (var key in this.cache) {
+            var value = this.cache[key];
+            console.log(key , value);
+            if(value.isModified){
+                //upload
+                editorSource.updateFile(key,value.code);
+            }
+        }
+    }
+
+    handlePushAllSuccess(){
+
+    }
+
+    handlePushFailed(){
+
     }
 
     updateView() {

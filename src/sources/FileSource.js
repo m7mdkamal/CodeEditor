@@ -33,13 +33,13 @@ export function newFile(fileName) {
 export function deleteFile(name) {
     var promise = request.del('http://localhost:8080/files/'+name);
     promise.then(function (data) {
+        console.log(data);
         data = JSON.parse(data);
         if(data.status == "SUCCESS"){
-            actions.deleteFileSuccess(name);
-        }else{
-            throw err("failed");
+            return actions.deleteFileSuccess(name);
         }
     }).catch(function (err) {
+        console.error(err)
         actions.deleteFileFailed();
     })
 }

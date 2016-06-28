@@ -3,16 +3,18 @@ import * as actions from './../actions/actions'
 
 export function fetchCode(name) {
     var promise = request.fetch('http://localhost:8080/files/' + name);
-    promise.then(function (code) {
-        // console.log("FETCHCODE", code);
-        actions.fetchCodeSuccess(name, code);
+    promise.then(function (data) {
+        data = JSON.parse(data);
+        if(data.status == "SUCCESS"){
+            return actions.fetchCodeSuccess(name, data.data);
+        }
     }).catch(function (err) {
 
     })
 }
 
-export function updateFile(file) {
-    var promise = request.post('https://project-2517129240075729404.firebaseio.com/files.json',file)
+export function updateFile(file,sourceCode) {
+    var promise = request.post('http://localhost:8080/files/' + file,sourceCode);
     promise.then(function (files) {
         console.log(files);
         actions.postFileSuccess(JSON.parse(files));
@@ -21,12 +23,16 @@ export function updateFile(file) {
     })
 }
 
-// export function deleteFile(name) {
-//     var promise = del('https://project-2517129240075729404.firebaseio.com/files/'+name+'.json');
-//     promise.then(function (files) {
-//         console.log(files);
-//         actions.deleteFileSuccess(JSON.parse(files));
-//     }).catch(function (err) {
-//
-//     })
-// }
+
+export function compile() {
+    var promise = request.post('http://localhost:8080/compile');
+    promise.then(function (data) {
+        console.log(data);
+        data = JSON.parse(data);
+        // if(data.status == "SUCCESS" || data.status == "SUCCESS")
+            actions.compileSuccess(data.data);
+        
+    }).catch(function (err) {
+
+    })
+}
