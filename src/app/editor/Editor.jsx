@@ -3,6 +3,7 @@ import Tab from './Tab'
 import TabStore from '../../stores/TabStore'
 import EditorStore from '../../stores/EditorStore'
 import  * as actions from '../../actions/actions'
+import alertify from 'alertify.js'
 
 // require('brace/mode/java');
 // require('brace/theme/monokai');
@@ -10,6 +11,7 @@ import  * as actions from '../../actions/actions'
 // import ace from 'brace'
 var TAB_CHANGE_EVENT = 'TABCHANGE';
 var EDITOR_CHANGE_EVENT = 'EDITORCHANGE';
+var DEPENDENCY_SUCCESS = 'DEPENDENCYSUCCESS';
 
 class Editor extends React.Component {
 
@@ -36,6 +38,10 @@ class Editor extends React.Component {
         });
         EditorStore.on(EDITOR_CHANGE_EVENT, function () {
             // editor.session.setValue(this.state.code)
+        });
+
+        EditorStore.on(DEPENDENCY_SUCCESS, function () {
+            alertify.success("Dependency Updated.");
         })
     }
 
@@ -50,7 +56,7 @@ class Editor extends React.Component {
         });
         editor.setTheme("ace/theme/textmate");
         editor.getSession().setMode("ace/mode/java");
-        editor.setFontSize(12);
+        editor.setFontSize(14);
         EditorStore.on(EDITOR_CHANGE_EVENT, this.onEditorChange);
         window.editor = editor;
 

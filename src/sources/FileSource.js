@@ -2,11 +2,10 @@ import * as request from './../utils/Requests'
 import * as actions from './../actions/actions'
 
 export function fetchFiles() {
-    var promise = request.fetch('http://localhost:8080/files')
+    var promise = request.fetch('files')
     promise.then(function (data) {
         data = JSON.parse(data);
         if(data.status == "SUCCESS"){
-            console.log(data);
             actions.fetchFilesSuccess(JSON.parse(data.data));
         }else{
             throw err("failed");
@@ -17,7 +16,7 @@ export function fetchFiles() {
 }
 
 export function newFile(fileName) {
-    var promise = request.post('http://localhost:8080/files/'+fileName," ");
+    var promise = request.post('files/'+fileName," ");
     promise.then(function (data) {
         data = JSON.parse(data);
         if(data.status == "SUCCESS"){
@@ -31,7 +30,7 @@ export function newFile(fileName) {
 }
 
 export function deleteFile(name) {
-    var promise = request.del('http://localhost:8080/files/'+name);
+    var promise = request.del('files/'+name);
     promise.then(function (data) {
         console.log(data);
         data = JSON.parse(data);

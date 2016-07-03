@@ -9,6 +9,7 @@ import alertify from 'alertify.js'
 var EDITOR_CHANGE_EVENT = 'EDITORCHANGE';
 var TAB_CHANGE_EVENT = 'TABCHANGE';
 var TAB_CLOSE_EVENT = 'TABCLOSEEVENT';
+var DEPENDENCY_SUCCESS = 'DEPENDENCYSUCCESS';
 
 class EditorStore extends EventEmitter {
 
@@ -19,6 +20,7 @@ class EditorStore extends EventEmitter {
         this.cache = {};
         this.active = 0;
         this.errors = [];
+        this.pom = "";
         this.state = {error: null, selected: null};
 
         this.handleTabChange = this.handleTabChange.bind(this);
@@ -39,7 +41,7 @@ class EditorStore extends EventEmitter {
                 this.handleCodeChanging(action.code);
                 break;
             case "CLEAR_FILE_CACHE":
-                this.handleTabClose(action.id)
+                this.handleTabClose(action.id);
                 break;
             case "PUSH_ALL":
                 this.handlePushAll();
@@ -50,7 +52,18 @@ class EditorStore extends EventEmitter {
             case "PUSH_ALL_FAILED":
                 this.handlePushFailed();
                 break;
-
+            case "FETCH_DEPENDENCY":
+                this.handleFetchDependency();
+                break;
+            case "FETCH_DEPENDENCY_SUCCESS":
+                this.handleFetchDependencySuccess(action.pom);
+                break;
+            case "UPDATE_DEPENDENCY":
+                this.handleUpdateDependency(action.pom);
+                break;
+            case "UPDATE_DEPENDENCY_SUCCESS":
+                this.handleUpdateDependencySuccess();
+                break;
 
         }
 
@@ -118,6 +131,25 @@ class EditorStore extends EventEmitter {
         this.emit(EDITOR_CHANGE_EVENT);
     }
 
+    handleFetchDependency(){
+        editorSource.fetchDependency();
+    }
+
+    handleFetchDependencySuccess(pom){
+        this.pom = pom;
+    }
+
+    handleUpdateDependency(pom){
+        editorSource.updateDependency(pom)
+    }
+
+    handleUpdateDependencySuccess(){
+        this.emit(DEPENDENCY_SUCCESS);
+    }
+
+    getPom(){
+        return this.pom;
+    }
 }
 
 

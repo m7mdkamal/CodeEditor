@@ -184,6 +184,44 @@ export function compileFailed() {
 
 export function clearLogs() {
     dispatcher.dispatch({
-        type:"CLEAR_LOGS",
+        type:"CLEAR_LOGS"
+    })
+}
+
+export function fetchDependency() {
+    dispatcher.dispatch({
+        type:"FETCH_DEPENDENCY"
+    })
+}
+
+export function fetchDependencySuccess(pom) {
+    dispatcher.dispatch({
+        type:"FETCH_DEPENDENCY_SUCCESS",
+        pom
+    })
+}
+
+export function fetchDependencyFailed() {
+    dispatcher.dispatch({
+        type:"FETCH_DEPENDENCY_FAILED"
+    })
+}
+
+export function updateDependency(pom) {
+    dispatcher.dispatch({
+        type:"UPDATE_DEPENDENCY",
+        pom
+    })
+}
+
+export function updateDependencySuccess() {
+    dispatcher.dispatch({
+        type:"UPDATE_DEPENDENCY_SUCCESS"
+    })
+}
+
+export function updateDependencyFailed() {
+    dispatcher.dispatch({
+        type:"UPDATE_DEPENDENCY_FAILED"
     })
 }
